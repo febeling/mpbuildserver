@@ -1,0 +1,23 @@
+#!/usr/bin/env ruby
+$:.unshift(File.dirname(__FILE__) + "/../lib")
+require "optparse"
+require "mpbuilder"
+require "yaml"
+
+settings = YAML.load_file(MpBuilder::CONFIG_DIR + "/config.yml")
+
+settings[:poll_interval] ||= 300
+settings[:logfile]       ||= MpBuilder::LOG_DIR + "/#{File.basename(__FILE__)}.log"
+settings[:continuously]  ||= false
+
+OptionParser.new do |opts|
+  opts.banner = "Usage: #{File.basename __FILE__} [options]"
+  opts.on("-r REV", "Build for ports with changes since REVISION")             { |settings[:start_revision]| }
+  opts.on("-c", "Loop and poll svn continuously (default: false)")             { |settings[:continuously]| }
+  opts.on("-i SECONDS", "Interval between queries to svn repository", Integer) { |settings[:poll_interval]| }
+  opts.on("-l LOGFILE", "Name of log file (default: log/mpbuildserver.log)")   { |settings[:logfile]| }
+  opts.on("-v", "Verbose (mirror log file output to console)")                 { settings[:verbose] = true }
+  opts.on("-h", "This help text")                                              { puts opts ; exit }
+end.parse!
+
+MpBuilder.new(settings).run
