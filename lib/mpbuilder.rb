@@ -13,7 +13,7 @@ class MpBuilder
   CONFIG_DIR        = MPBUILDSERVER_DIR + "/etc"
   LOG_DIR           = MPBUILDSERVER_DIR + "/log"
   MP_SVN_URL        = "http://svn.macosforge.org/repository/macports/trunk/dports"
-  PORTNAME_RE       = Regexp.new '^/trunk/dports/[^/]+/([^/]+)'
+  PORTNAME_RE       = Regexp.new '^/trunk/dports/[^_][^/]*/([^/]+)'
   DATE_FORMAT       = "%Y-%m-%d %H:%M:%S"
 
   def basedir
@@ -21,7 +21,7 @@ class MpBuilder
   end
 
   def mpabdir
-    File.expand_path(basedir + "/../mpab")
+    @settings[:mpab_dir] || File.expand_path(basedir + "/../mpab")
   end
 
   def port

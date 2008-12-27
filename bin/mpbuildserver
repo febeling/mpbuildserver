@@ -16,6 +16,8 @@ OptionParser.new do |opts|
   opts.on("-c", "Loop and poll svn continuously (default: false)")             { |settings[:continuously]| }
   opts.on("-i SECONDS", "Interval between queries to svn repository", Integer) { |settings[:poll_interval]| }
   opts.on("-l LOGFILE", "Name of log file (default: log/mpbuildserver.log)")   { |settings[:logfile]| }
+  opts.on("-m PATH", "Directory to directory containing mpab script " +
+          "(default: next to mpbuildserver directory)")                        { |settings[:mpab_dir]| }
   opts.on("-v", "Verbose (mirror log file output to console)")                 { settings[:verbose] = true }
   opts.on("-h", "This help text")                                              { puts opts ; exit }
 end.parse!

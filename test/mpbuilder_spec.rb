@@ -1,6 +1,6 @@
 $:.unshift(File.dirname(__FILE__) + "/../lib")
 require "rubygems"
-gem "rspec", "=1.1.4"
+gem "rspec", ">=1.1.4"
 
 require "spec"
 require "mpbuilder"
@@ -47,6 +47,11 @@ describe "MpBuilder with running CouchDB" do
       "qt4-x11" => "42117,42119",
       "libgda3" => "42118"
     }
+  end
+  
+  it "filters out _resource files" do
+    update = ["/trunk/dports/_resources/port1.0/variant_descriptions.conf", "44349"]
+    @builder.filter_ports([update]).should == {}
   end
 end
 
