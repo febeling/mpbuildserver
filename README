@@ -1,0 +1,7 @@
+
+A typical invokation looks like this:
+
+  sudo ./bin/mpbuildserver -v -c -i 240 \
+     -m /Users/febeling/svk-dev/mp-contrib/mpab \
+     -r 44331
+
