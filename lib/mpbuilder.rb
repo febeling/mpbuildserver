@@ -156,6 +156,12 @@ class MpBuilder
     File.basename(/(.+).log/.match(logfile)[1])
   end
 
+  def shorten(log)
+    lines = log.split("\n")
+    first_line = [lines.size - 256, 0].max
+    lines[first_line..-1].join("\n")
+  end
+
   def read_results(updated_ports)
     logs = Dir[self.mpabdir + "/logs-*"]
     if logs.empty?
@@ -165,16 +171,17 @@ class MpBuilder
       builds = []
       [:fail, :success].each { |state|
         Dir[resultdir + "/#{state.to_s}/*.log"].map { |entry|
-          [logfile_to_name(entry), IO.read(entry)]
+          [logfile_to_name(entry), shorten(IO.read(entry)) ]
         }.each { |name, log|
           build = {}
-          build["name"]     = name
-          build["revision"] = updated_ports[name] || "revision not found"
-          build["state"]    = state.to_s
-          build["cpu"]      = Config::CONFIG["target_cpu"]
-          build["os"]       = "" << `uname -s`.strip! << " " << `uname -r`.strip!
-          build["time"]     = Time.now.strftime(DATE_FORMAT)
-          build["log"]      = log if state == :fail
+          build["name"]       = name
+          build["revision"]   = updated_ports[name] || "revision not found"
+          build["state"]      = state.to_s
+          build["cpu"]        = Config::CONFIG["target_cpu"]
+          build["os"]         = "" << `uname -s`.strip! << " " << `uname -r`.strip!
+          build["time"]       = Time.now.strftime(DATE_FORMAT)
+          build["log"]        = log if state == :fail
+          build["ruby_class"] = "Build"
           builds << build
         }
       }
