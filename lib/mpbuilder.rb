@@ -2,9 +2,11 @@ require "rubygems"
 require 'tempfile'
 require "rexml/document"
 require "rexml/xpath"
-require "couch"
 require "json"
 require "open4"
+
+require "couch"
+require "result_store"
 
 class MpBuilder
   include REXML
@@ -55,6 +57,7 @@ class MpBuilder
   def run
     start_rev    = @settings[:start_revision] || svn_find_latest_revision
     continuously = @settings[:continuously]
+    @result_store = MpBuildServer::BuildStore.new(@settings[:buildstore])
 
     build start_rev, poll_interval, continuously
 
@@ -119,7 +122,7 @@ class MpBuilder
 
   def build_ports(ports_file)
     trace "Refreshing chroot port tree..."
-    execute("#{mpabdir}/mpsync.sh") || raise("port tree sync failure")
+    execute("sh #{mpabdir}/mpsync.sh") || raise("port tree sync failure")
     trace "Building in chroot"
     execute("#{mpabdir}/mpab buildports #{ports_file}")
   end
@@ -148,7 +151,7 @@ class MpBuilder
   
   def insert(results)
     results.each do |build|
-      couch.put("/#{database}/#{rand(1000_000).to_s}", build.to_json)
+      @result_store.insert(build)
     end
   end
 
