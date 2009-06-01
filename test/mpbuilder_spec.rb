@@ -1,6 +1,6 @@
 $:.unshift(File.dirname(__FILE__) + "/../lib")
 require "rubygems"
-gem "rspec", ">=1.1.4"
+gem "rspec"
 
 require "spec"
 require "mpbuilder"
@@ -12,7 +12,9 @@ describe "MpBuilder with running CouchDB" do
       :server   => "127.0.0.1",
       :port     => "5984"
     }
-    @builder = MpBuilder.new options
+    @builder = MpBuilder.new(options)
+    result_store = mock("result store", :insert => nil)
+    @builder.stub!(:result_store).and_return(result_store)
   end
 
   it "can insert" do
@@ -67,11 +69,9 @@ end
 
 describe "MpBuilder with result log directory structure" do
   before do
-    @builder = MpBuilder.new(:logfile => "/dev/null")
-    @builder.instance_variable_set("@settings", {:keeplog => true})
-    def @builder.mpabdir
-      "test/fixtures"
-    end
+    @builder = MpBuilder.new(:logfile => "/dev/null", 
+                             :keeplog => true,
+                             :logdir => "test/fixtures/logs")
     @updated_ports = {
       "libxz3" => "123",
       "squid" => "124",

@@ -1,6 +1,6 @@
 $:.unshift(File.dirname(__FILE__) + "/../lib")
 require "rubygems"
-gem "rspec", "=1.1.4"
+gem "rspec" #, "=1.1.4"
 require "spec"
 require "couch"
 require "mpbuilder"

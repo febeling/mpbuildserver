@@ -11,15 +11,27 @@ require "result_store"
 class MpBuilder
   include REXML
 
-  MPBUILDSERVER_DIR = File.dirname(__FILE__) + "/.."
-  CONFIG_DIR        = MPBUILDSERVER_DIR + "/etc"
-  LOG_DIR           = MPBUILDSERVER_DIR + "/log"
+  BASE_DIR          = File.dirname(__FILE__) + "/.."
+  CONFIG_DIR        = BASE_DIR + "/etc"
+  LOG_DIR           = BASE_DIR + "/log"
   MP_SVN_URL        = "http://svn.macosforge.org/repository/macports/trunk/dports"
   PORTNAME_RE       = Regexp.new '^/trunk/dports/[^_][^/]*/([^/]+)'
   DATE_FORMAT       = "%Y-%m-%d %H:%M:%S"
+  LOG_TAIL_LINES    = 4096
+
+  attr_reader :result_store
+
+  def initialize(settings)
+    @settings = settings
+    @result_store = MpBuildServer::BuildStore.new(@settings[:buildstore])
+  end
 
   def basedir
-    MPBUILDSERVER_DIR
+    @settings[:basedir] || BASE_DIR
+  end
+
+  def logdir
+    @settings[:logdir] || LOG_DIR
   end
 
   def mpabdir
@@ -46,10 +58,6 @@ class MpBuilder
     @couch ||= Couch::Server.new(server, port)
   end
 
-  def initialize(settings)
-    @settings = settings
-  end
-
   def logfile
     @logfile ||= File.open(@settings[:logfile], "w+")
   end
@@ -57,7 +65,6 @@ class MpBuilder
   def run
     start_rev    = @settings[:start_revision] || svn_find_latest_revision
     continuously = @settings[:continuously]
-    @result_store = MpBuildServer::BuildStore.new(@settings[:buildstore])
 
     build start_rev, poll_interval, continuously
 
@@ -151,7 +158,7 @@ class MpBuilder
   
   def insert(results)
     results.each do |build|
-      @result_store.insert(build)
+      result_store.insert(build)
     end
   end
 
@@ -161,12 +168,12 @@ class MpBuilder
 
   def shorten(log)
     lines = log.split("\n")
-    first_line = [lines.size - 256, 0].max
+    first_line = [lines.size - LOG_TAIL_LINES, 0].max
     lines[first_line..-1].join("\n")
   end
 
   def read_results(updated_ports)
-    logs = Dir[self.mpabdir + "/logs-*"]
+    logs = Dir["#{logdir}/logs-*"]
     if logs.empty?
       []
     else
