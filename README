@@ -1,4 +1,11 @@
 
+== Dependencies
+
+- json gem
+- rest-client gem
+- febeling-couch_potato gem
+
+
 A typical invokation looks like this:
 
   sudo ./bin/mpbuildserver -v -c -i 240 \
