@@ -5,15 +5,12 @@ require "rexml/xpath"
 require "json"
 require "open4"
 
-require "couch"
 require "result_store"
 
 class MpBuilder
   include REXML
 
   BASE_DIR          = File.dirname(__FILE__) + "/.."
-  CONFIG_DIR        = BASE_DIR + "/etc"
-  LOG_DIR           = BASE_DIR + "/log"
   MP_SVN_URL        = "http://svn.macosforge.org/repository/macports/trunk/dports"
   PORTNAME_RE       = Regexp.new '^/trunk/dports/[^_][^/]*/([^/]+)'
   DATE_FORMAT       = "%Y-%m-%d %H:%M:%S"
@@ -30,36 +27,24 @@ class MpBuilder
     @settings[:basedir] || BASE_DIR
   end
 
+  def workdir
+    @settings[:workdir] || Dir.pwd
+  end
+
   def logdir
-    @settings[:logdir] || LOG_DIR
+    @settings[:logdir] || basedir + "/log"
+  end
+
+  def logfile
+    @logfile ||= File.open("#{logdir}/#{@settings[:logfile]}", "w+")
   end
 
   def mpabdir
-    @settings[:mpab_dir] || File.expand_path(basedir + "/../mpab")
-  end
-
-  def port
-    @settings[:port]
-  end
-
-  def server
-    @settings[:server]
-  end
-
-  def database
-    @settings[:database]
+    @settings[:mpab_dir]
   end
 
   def poll_interval
     @settings[:poll_interval]
-  end
-
-  def couch
-    @couch ||= Couch::Server.new(server, port)
-  end
-
-  def logfile
-    @logfile ||= File.open(@settings[:logfile], "w+")
   end
 
   def run
@@ -69,7 +54,7 @@ class MpBuilder
     build start_rev, poll_interval, continuously
 
     trace "run finished"
-    logfile.close if logfile
+    logfile.close
   end
 
   def trace(messages)
@@ -128,10 +113,12 @@ class MpBuilder
   end
 
   def build_ports(ports_file)
-    trace "Refreshing chroot port tree..."
-    execute("sh #{mpabdir}/mpsync.sh") || raise("port tree sync failure")
-    trace "Building in chroot"
-    execute("#{mpabdir}/mpab buildports #{ports_file}")
+    Dir.chdir(workdir) do
+      trace "Refreshing chroot port tree..."
+      execute("sh #{mpabdir}/mpsync.sh") || raise("port tree sync failure")
+      trace "Building in chroot"
+      execute("#{mpabdir}/mpab buildports #{ports_file}")
+    end
   end
 
   def execute(command)
@@ -173,7 +160,7 @@ class MpBuilder
   end
 
   def read_results(updated_ports)
-    logs = Dir["#{logdir}/logs-*"]
+    logs = Dir["#{workdir}/logs-*"]
     if logs.empty?
       []
     else
@@ -195,7 +182,7 @@ class MpBuilder
           builds << build
         }
       }
-      logs.each { |logdir| FileUtils.rm_r(logdir) } unless @settings[:keeplog]
+      logs.each { |dir| FileUtils.rm_r(dir) } unless @settings[:keeplog]
       builds
     end
   end

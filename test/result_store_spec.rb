@@ -5,7 +5,7 @@ require 'result_store'
 
 describe "storing a build result" do
   before do
-    @store = MpBuildServer::BuildStore.new("http://127.0.0.1:3000/builds/create")
+    @store = MpBuildServer::BuildStore.new("http://127.0.0.1:3000")
     @build = { 
       'name'       => 'test_build', 
       'revision'   => '2345', 
@@ -17,8 +17,17 @@ describe "storing a build result" do
     }
   end
   
-  it "over REST" do
+  it "over REST as JSON" do
     RestClient.should_receive(:post).with("http://127.0.0.1:3000/builds/create", @build.to_json)
     @store.insert(@build)
+  end
+
+  it "has insert URL" do
+    @store.insert_url.should == "http://127.0.0.1:3000/builds/create"
+  end
+
+  it "removes redundant slash from server name" do
+    @store = MpBuildServer::BuildStore.new("http://serv.er/")
+    @store.insert_url.should == "http://serv.er/builds/create"
   end
 end

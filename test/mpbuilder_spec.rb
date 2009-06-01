@@ -23,8 +23,9 @@ describe "MpBuilder with running CouchDB" do
     @builder.insert(result)
   end
 
-  it "mpabdir" do
-    @builder.mpabdir.should match(/\/mpab$/)
+  it "mpabdir set via options" do
+    builder = MpBuilder.new(:mpab_dir => "mpabpath")
+    builder.mpabdir.should == 'mpabpath'
   end
 
   it "extracting ports and revisions from svn log" do
@@ -59,7 +60,7 @@ end
 
 describe "MpBuilder sub-process execution using :run" do
   before do
-    @builder = MpBuilder.new(:logfile => "/dev/null")
+    @builder = MpBuilder.new(:logfile => "/dev/null", :logdir => "")
   end
 
   it "main success case" do

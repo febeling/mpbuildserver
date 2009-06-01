@@ -1,14 +1,34 @@
 
+== Mpbuildserver
+
+Mpbuildserver watches the MacPorts source repository for changes and
+builds changed ports inside of a chroot environment, possibly posting
+build results to Portmill[1] web application, to store them and make
+them searchable and browsable.
+
 == Dependencies
 
-- json gem
-- rest-client gem
-- febeling-couch_potato gem
+Mpbuildserver relies on ruby 1.8 and these libraries:
 
+- mpab -- MacPorts AutoBuild, an environment for building a MacPorts
+  and installing ports in a chroot environment. Part of the MacPorts
+  contrib collection[2].
+- json gem / rubyforge.com
+- rest-client gem / rubyforge.com
+- febeling-couch_potato gem / gems.github.com
+
+== Usage
 
 A typical invokation looks like this:
 
-  sudo ./bin/mpbuildserver -v -c -i 240 \
-     -m /Users/febeling/svk-dev/mp-contrib/mpab \
-     -r 44331
+  sudo ./bin/mpbuildserver -v \
+           -c -i 180 \
+           -m ../../vendor/mp-contrib/mpab \
+           -s http://portmill.florianebeling.com/builds/create 
 
+This assumes a Portmill application running 
+
+=== References
+
+1 Portmill, http://github.com/langalex/portmill
+2 Mpab, http://svn.macports.org/repository/macports/contrib/mpab

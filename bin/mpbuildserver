@@ -4,10 +4,10 @@ require "optparse"
 require "mpbuilder"
 require "yaml"
 
-settings = YAML.load_file(MpBuilder::CONFIG_DIR + "/config.yml")
+settings = {}
 
 settings[:poll_interval] ||= 300
-settings[:logfile]       ||= MpBuilder::LOG_DIR + "/#{File.basename(__FILE__)}.log"
+settings[:logfile]       ||= "#{File.basename(__FILE__)}.log"
 settings[:continuously]  ||= false
 settings[:buildstore]    ||= "http://127.0.0.1:3000/builds/create"
 

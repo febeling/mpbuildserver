@@ -1,0 +1,7 @@
+#!/bin/sh
+echo $1 | grep -q "MacPorts-......tar.gz" -
+if [[ $? == 0 ]]; then
+    echo "Building MacPorts from release tarball"
+else
+    echo "Not matched tarball"
+fi
