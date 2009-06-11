@@ -13,13 +13,13 @@ settings[:buildstore]    ||= "http://127.0.0.1:3000/builds/create"
 
 OptionParser.new do |opts|
   opts.banner = "Usage: #{File.basename __FILE__} [options]"
-  opts.on("-r REV", "Build for ports with changes since REVISION")             { |settings[:start_revision]| }
-  opts.on("-c", "Loop and poll svn continuously (default: false)")             { |settings[:continuously]| }
-  opts.on("-i SECONDS", "Interval between queries to svn repository", Integer) { |settings[:poll_interval]| }
-  opts.on("-l LOGFILE", "Name of log file (default: log/mpbuildserver.log)")   { |settings[:logfile]| }
-  opts.on("-s BUILDSTORE", "URL of the build store server")                    { |settings[:buildstore]| }
+  opts.on("-r REV", "Build for ports with changes since REVISION")             { |r| settings[:start_revision] = r }
+  opts.on("-c", "Loop and poll svn continuously (default: false)")             { |c| settings[:continuously] = c }
+  opts.on("-i SECONDS", "Interval between queries to svn repository", Integer) { |i| settings[:poll_interval] = i }
+  opts.on("-l LOGFILE", "Name of log file (default: log/mpbuildserver.log)")   { |l| settings[:logfile] = l }
+  opts.on("-s BUILDSTORE", "URL of the build store server")                    { |s| settings[:buildstore] = s }
   opts.on("-m PATH", "Directory to directory containing mpab script " +
-          "(default: next to mpbuildserver directory)")                        { |settings[:mpab_dir]| }
+          "(default: next to mpbuildserver directory)")                        { |m| settings[:mpab_dir] = m }
   opts.on("-v", "Verbose (mirror log file output to console)")                 { settings[:verbose] = true }
   opts.on("-h", "This help text")                                              { puts opts ; exit }
 end.parse!
