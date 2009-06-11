@@ -72,7 +72,7 @@ describe "MpBuilder with result log directory structure" do
   before do
     @builder = MpBuilder.new(:logfile => "/dev/null", 
                              :keeplog => true,
-                             :logdir => "test/fixtures/logs")
+                             :workdir => "test/fixtures/logs")
     @updated_ports = {
       "libxz3" => "123",
       "squid" => "124",
