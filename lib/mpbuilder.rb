@@ -159,6 +159,10 @@ class MpBuilder
     lines[first_line..-1].join("\n")
   end
 
+  def find_chroot_port_version
+    system("echo /opt/local/bin/port version | mpab shell 2>/dev/null | grep Version: | awk '{print $2}'")
+  end
+
   def read_results(updated_ports)
     logs = Dir["#{workdir}/logs-*"]
     if logs.empty?
@@ -179,6 +183,7 @@ class MpBuilder
           build["time"]       = Time.now.strftime(DATE_FORMAT)
           build["log"]        = log if state == :fail
           build["ruby_class"] = "Build"
+          build["port_version"] = find_chroot_port_version
           builds << build
         }
       }
