@@ -4,18 +4,22 @@
 Mpbuildserver watches the MacPorts source repository for changes and
 builds changed ports inside of a chroot environment, possibly posting
 build results to Portmill[1] web application, to store them and make
-them searchable and browsable.
+them searchable and browsable. It wraps around MacPorts AutoBuild
+(MPAB) by Bryan Blackburn to create the chroot environment and do the
+actual building.
 
 == Dependencies
 
 Mpbuildserver relies on ruby 1.8 and these libraries:
 
-- mpab -- MacPorts AutoBuild, an environment for building a MacPorts
-  and installing ports in a chroot environment. Part of the MacPorts
-  contrib collection[2].
+- mpab -- for building a MacPorts and installing ports in a chroot
+  environment. Part of the MacPorts contrib collection[2].
+
 - json gem / rubyforge.com
+
 - rest-client gem / rubyforge.com
-- febeling-couch_potato gem / gems.github.com
+
+- open4 gem / rubyforge.com
 
 == Usage
 
@@ -24,9 +28,15 @@ A typical invokation looks like this:
   sudo ./bin/mpbuildserver -v \
            -c -i 180 \
            -m ../../vendor/mp-contrib/mpab \
-           -s http://portmill.florianebeling.com/builds/create 
+           -s http://storageserver.mydomain.com/
 
-This assumes a Portmill application running 
+This assumes a Portmill application running at the indicated URL.
+
+== Development
+
+To run the tests type:
+
+  rake test
 
 === References
 
